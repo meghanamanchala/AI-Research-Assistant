@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { generateQuiz, listDocuments } from '../services/api';
+import { AlertCircle, BarChart3, CircleHelp, LoaderCircle, Target } from 'lucide-react';
 
 export default function QuizPage() {
   const [documents, setDocuments] = useState([]);
@@ -36,7 +37,7 @@ export default function QuizPage() {
       {/* Quiz Generator Section */}
       <section className="page-section">
         <div className="section-header">
-          <div className="section-icon">❓</div>
+          <div className="section-icon"><CircleHelp size={44} strokeWidth={1.75} /></div>
           <div>
             <h1>Generate Quiz</h1>
             <p className="section-description">Create multiple-choice questions from your documents to test comprehension</p>
@@ -63,10 +64,10 @@ export default function QuizPage() {
             </div>
             
             <button className="button button-primary" type="button" onClick={handleGenerate} disabled={loading}>
-              {loading ? '⏳ Generating...' : '🎯 Generate Quiz'}
+              {loading ? <><LoaderCircle className="button-icon spin" size={18} strokeWidth={2} /> Generating...</> : <><Target className="button-icon" size={18} strokeWidth={2} /> Generate Quiz</>}
             </button>
           </div>
-          {error ? <p className="error">✕ {error}</p> : null}
+          {error ? <p className="error"><AlertCircle className="status-icon" size={16} strokeWidth={2} />{error}</p> : null}
         </div>
       </section>
 
@@ -74,7 +75,7 @@ export default function QuizPage() {
       {items.length > 0 ? (
         <section className="page-section">
           <div className="section-header">
-            <div className="section-icon">📊</div>
+            <div className="section-icon"><BarChart3 size={44} strokeWidth={1.75} /></div>
             <h2>Questions ({items.length})</h2>
           </div>
           

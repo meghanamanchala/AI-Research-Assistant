@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { compareDocuments, listDocuments } from '../services/api';
+import { AlertCircle, BarChart3, LoaderCircle, Scale, Search } from 'lucide-react';
 
 export default function ComparePage() {
   const [documents, setDocuments] = useState([]);
@@ -37,7 +38,7 @@ export default function ComparePage() {
       {/* Compare Section */}
       <section className="page-section">
         <div className="section-header">
-          <div className="section-icon">⚖️</div>
+          <div className="section-icon"><Scale size={44} strokeWidth={1.75} /></div>
           <div>
             <h1>Compare Documents</h1>
             <p className="section-description">Analyze similarities and differences between your research documents</p>
@@ -75,10 +76,10 @@ export default function ComparePage() {
             </div>
             
             <button className="button button-primary" type="button" onClick={handleCompare} disabled={loading} style={{ alignSelf: 'flex-start' }}>
-              {loading ? '⏳ Comparing...' : '🔍 Compare'}
+              {loading ? <><LoaderCircle className="button-icon spin" size={18} strokeWidth={2} /> Comparing...</> : <><Search className="button-icon" size={18} strokeWidth={2} /> Compare</>}
             </button>
           </div>
-          {error ? <p className="error">✕ {error}</p> : null}
+          {error ? <p className="error"><AlertCircle className="status-icon" size={16} strokeWidth={2} />{error}</p> : null}
         </div>
       </section>
 
@@ -86,7 +87,7 @@ export default function ComparePage() {
       {comparison ? (
         <section className="page-section">
           <div className="section-header">
-            <div className="section-icon">📊</div>
+            <div className="section-icon"><BarChart3 size={44} strokeWidth={1.75} /></div>
             <h2>Comparison Results</h2>
           </div>
           
