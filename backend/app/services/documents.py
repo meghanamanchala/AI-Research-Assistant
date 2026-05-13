@@ -97,7 +97,7 @@ class DocumentStore:
     def latest(self) -> StoredDocument:
         if not self._documents:
             raise KeyError("No documents have been uploaded yet.")
-        return next(reversed(self._documents.values()))
+        return list(self._documents.values())[-1]
 
 
 def extract_text_from_pdf(file_path: Path) -> tuple[str, int]:
