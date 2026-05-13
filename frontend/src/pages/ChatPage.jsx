@@ -36,47 +36,71 @@ export default function ChatPage() {
   }
 
   return (
-    <section className="stack">
-      <div className="card">
-        <h1>Ask Questions</h1>
-        <form className="stack-form" onSubmit={handleAsk}>
-          <label>
-            Document
-            <select value={documentId} onChange={(event) => setDocumentId(event.target.value)}>
-              {documents.length === 0 ? <option value="">No documents available</option> : null}
-              {documents.map((document) => (
-                <option key={document.document_id} value={document.document_id}>
-                  {document.filename}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Question
-            <textarea value={question} onChange={(event) => setQuestion(event.target.value)} rows={5} />
-          </label>
-          <button className="button" type="submit" disabled={loading}>
-            {loading ? 'Thinking...' : 'Ask'}
-          </button>
-        </form>
-        {error ? <p className="error">{error}</p> : null}
-      </div>
-
-      {answer ? (
-        <div className="card">
-          <h2>Answer</h2>
-          <pre className="answer-box">{answer}</pre>
-          <h3>Sources</h3>
-          <div className="source-grid">
-            {sources.map((source, index) => (
-              <article className="source-card" key={`${source.document_id || 'source'}-${index}`}>
-                <strong>{source.filename}</strong>
-                <p>{source.chunk_preview}</p>
-              </article>
-            ))}
+    <div className="page-container">
+      {/* Chat Section */}
+      <section className="page-section">
+        <div className="section-header">
+          <div className="section-icon">💬</div>
+          <div>
+            <h1>Chat with Documents</h1>
+            <p className="section-description">Ask questions and get instant answers from your research materials</p>
           </div>
         </div>
+        
+        <div className="section-content">
+          <form className="chat-form" onSubmit={handleAsk}>
+            <div className="form-group">
+              <label>Document</label>
+              <select value={documentId} onChange={(event) => setDocumentId(event.target.value)} disabled={documents.length === 0}>
+                {documents.length === 0 ? <option value="">No documents available</option> : null}
+                {documents.map((document) => (
+                  <option key={document.document_id} value={document.document_id}>
+                    {document.filename}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label>Your Question</label>
+              <textarea value={question} onChange={(event) => setQuestion(event.target.value)} rows={4} placeholder="What would you like to know about this document?" />
+            </div>
+            
+            <button className="button button-primary" type="submit" disabled={loading}>
+              {loading ? '⏳ Thinking...' : '🔍 Ask'}
+            </button>
+          </form>
+          {error ? <p className="error">✕ {error}</p> : null}
+        </div>
+      </section>
+
+      {/* Answer Section */}
+      {answer ? (
+        <section className="page-section">
+          <div className="section-header">
+            <div className="section-icon">💡</div>
+            <h2>Answer</h2>
+          </div>
+          
+          <div className="section-content">
+            <pre className="answer-box">{answer}</pre>
+            
+            {sources.length > 0 && (
+              <div className="sources-section">
+                <h3>📌 Sources</h3>
+                <div className="source-grid">
+                  {sources.map((source, index) => (
+                    <article className="source-card" key={`${source.document_id || 'source'}-${index}`}>
+                      <strong>{source.filename}</strong>
+                      <p>{source.chunk_preview}</p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
       ) : null}
-    </section>
+    </div>
   );
 }
