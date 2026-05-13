@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+.env
+.env.local
+uploads/
+chroma_db/
+node_modules/
+dist/
+.pytest_cache/
+.mypy_cache/
