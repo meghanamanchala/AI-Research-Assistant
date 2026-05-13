@@ -37,49 +37,79 @@ export default function SummaryPage() {
   }
 
   return (
-    <section className="stack">
-      <div className="card">
-        <h1>Summary</h1>
-        <div className="stack-form">
-          <label>
-            Document
-            <select value={documentId} onChange={(event) => setDocumentId(event.target.value)}>
-              {documents.length === 0 ? <option value="">No documents available</option> : null}
-              {documents.map((document) => (
-                <option key={document.document_id} value={document.document_id}>
-                  {document.filename}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Style
-            <select value={style} onChange={(event) => setStyle(event.target.value)}>
-              <option value="bullet">Bullet</option>
-              <option value="paragraph">Paragraph</option>
-            </select>
-          </label>
-          <button className="button" type="button" onClick={handleGenerate} disabled={loading}>
-            {loading ? 'Generating...' : 'Generate Summary'}
-          </button>
-        </div>
-        {error ? <p className="error">{error}</p> : null}
-      </div>
-
-      {summary ? (
-        <div className="card">
-          <h2>Summary Output</h2>
-          <pre className="answer-box">{summary}</pre>
-          <h3>Topics</h3>
-          <div className="chip-list">
-            {topics.map((topic) => (
-              <span className="chip" key={topic}>
-                {topic}
-              </span>
-            ))}
+    <div className="page-container">
+      {/* Summary Generator Section */}
+      <section className="page-section">
+        <div className="section-header">
+          <div className="section-icon">📋</div>
+          <div>
+            <h1>Generate Summary</h1>
+            <p className="section-description">Create concise summaries of your documents in bullet or paragraph format</p>
           </div>
         </div>
+        
+        <div className="section-content">
+          <div className="summary-form">
+            <div className="form-group">
+              <label>Document</label>
+              <select value={documentId} onChange={(event) => setDocumentId(event.target.value)} disabled={documents.length === 0}>
+                {documents.length === 0 ? <option value="">No documents available</option> : null}
+                {documents.map((document) => (
+                  <option key={document.document_id} value={document.document_id}>
+                    {document.filename}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label>Output Format</label>
+              <div className="radio-group">
+                <label className="radio-label">
+                  <input type="radio" value="bullet" checked={style === 'bullet'} onChange={(event) => setStyle(event.target.value)} />
+                  <span>Bullet Points</span>
+                </label>
+                <label className="radio-label">
+                  <input type="radio" value="paragraph" checked={style === 'paragraph'} onChange={(event) => setStyle(event.target.value)} />
+                  <span>Paragraph</span>
+                </label>
+              </div>
+            </div>
+            
+            <button className="button button-primary" type="button" onClick={handleGenerate} disabled={loading}>
+              {loading ? '⏳ Generating...' : '✨ Generate Summary'}
+            </button>
+          </div>
+          {error ? <p className="error">✕ {error}</p> : null}
+        </div>
+      </section>
+
+      {/* Summary Output Section */}
+      {summary ? (
+        <section className="page-section">
+          <div className="section-header">
+            <div className="section-icon">📄</div>
+            <h2>Summary</h2>
+          </div>
+          
+          <div className="section-content">
+            <pre className="answer-box">{summary}</pre>
+            
+            {topics.length > 0 && (
+              <div className="topics-section">
+                <h3>🏷️ Key Topics</h3>
+                <div className="chip-list">
+                  {topics.map((topic) => (
+                    <span className="chip" key={topic}>
+                      {topic}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
       ) : null}
-    </section>
+    </div>
   );
 }

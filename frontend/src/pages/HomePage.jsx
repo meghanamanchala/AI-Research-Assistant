@@ -1,37 +1,52 @@
+import { Link } from 'react-router-dom';
+
 export default function HomePage() {
   return (
-    <section className="hero card">
-      <div className="hero-copy">
-        <p className="eyebrow">Multi-Agent PDF Intelligence</p>
-        <h1>Upload documents, ask grounded questions, and generate study material.</h1>
-        <p className="lede">
-          This MVP connects a FastAPI backend to a React interface for PDF upload,
-          citation-aware Q&A, summaries, quizzes, and document comparison.
-        </p>
-        <div className="hero-grid">
-          <article className="stat">
-            <strong>PDF RAG</strong>
-            <span>Upload and query documents</span>
-          </article>
-          <article className="stat">
-            <strong>Summaries</strong>
-            <span>Generate concise notes</span>
-          </article>
-          <article className="stat">
-            <strong>Quizzes</strong>
-            <span>Create MCQ sets fast</span>
-          </article>
+    <div className="home-container">
+      {/* Hero Section */}
+      <section className="hero-section">
+        <div className="hero-content">
+          <h1>AI Research Assistant</h1>
+          <p className="hero-description">Upload, analyze, and extract insights from your research documents with AI-powered tools.</p>
+          <Link to="/upload" className="button button-primary">Get Started</Link>
         </div>
-      </div>
-      <div className="hero-panel">
-        <div className="panel-line" />
-        <h2>Recommended flow</h2>
-        <ol>
-          <li>Upload a PDF.</li>
-          <li>Select the document in Chat or Summary.</li>
-          <li>Ask questions or generate outputs.</li>
-        </ol>
-      </div>
-    </section>
+      </section>
+
+      {/* Features Section */}
+      <section className="features-section">
+        <h2>Core Features</h2>
+        <div className="features-grid">
+          <Link to="/upload" className="feature-card">
+            <div className="feature-icon">📄</div>
+            <h3>Upload</h3>
+            <p>Import PDF documents for analysis</p>
+          </Link>
+
+          <Link to="/chat" className="feature-card">
+            <div className="feature-icon">💬</div>
+            <h3>Chat</h3>
+            <p>Ask questions and get instant answers</p>
+          </Link>
+
+          <Link to="/summary" className="feature-card">
+            <div className="feature-icon">📋</div>
+            <h3>Summarize</h3>
+            <p>Generate bullet points or paragraphs</p>
+          </Link>
+
+          <Link to="/quiz" className="feature-card">
+            <div className="feature-icon">❓</div>
+            <h3>Quiz</h3>
+            <p>Create multiple-choice questions</p>
+          </Link>
+
+          <Link to="/compare" className="feature-card">
+            <div className="feature-icon">⚖️</div>
+            <h3>Compare</h3>
+            <p>Compare topics across documents</p>
+          </Link>
+        </div>
+      </section>
+    </div>
   );
 }

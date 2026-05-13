@@ -11,7 +11,7 @@ CHROMA_DIR.mkdir(parents=True, exist_ok=True)
 
 BACKEND_CORS_ORIGINS = [
     origin.strip()
-    for origin in os.getenv("BACKEND_CORS_ORIGINS", "http://localhost:5173").split(",")
+    for origin in os.getenv("BACKEND_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
     if origin.strip()
 ]
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
