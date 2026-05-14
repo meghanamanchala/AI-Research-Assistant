@@ -12,7 +12,7 @@ CHROMA_DIR.mkdir(parents=True, exist_ok=True)
 BACKEND_CORS_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://ai-research-assistant-orcin.vercel.app/",  
+    "https://ai-research-assistant-orcin.vercel.app",
 ]
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
