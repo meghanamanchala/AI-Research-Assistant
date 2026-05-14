@@ -9,6 +9,7 @@ app = FastAPI(title="AI Research Assistant", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=BACKEND_CORS_ORIGINS,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
