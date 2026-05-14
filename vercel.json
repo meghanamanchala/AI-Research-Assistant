@@ -1,0 +1,8 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "envPrefix": "VITE_",
+  "env": {
+    "VITE_API_BASE_URL": "@api-base-url"
+  }
+}
