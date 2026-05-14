@@ -34,7 +34,7 @@
 - [ ] Set Output Directory: `dist`
 - [ ] Add VITE_API_BASE_URL environment variable
 - [ ] Click Deploy and wait for completion
-- [ ] Copy frontend URL (e.g., https://ai-research-assistant.vercel.app)
+- [ ] Copy frontend URL (e.g., https://ai-research-assistant-orcin.vercel.app/)
 
 ### Phase 4: Final Backend Configuration
 - [ ] Edit `backend/app/core/config.py`
