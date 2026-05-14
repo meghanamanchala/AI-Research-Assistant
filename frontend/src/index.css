@@ -429,6 +429,11 @@ textarea {
   justify-content: center;
 }
 
+.feature-icon svg {
+  width: 1em;
+  height: 1em;
+}
+
 .feature-card h3 {
   font-size: 1.25rem;
   font-weight: 600;
@@ -495,6 +500,11 @@ textarea {
   flex-shrink: 0;
   line-height: 1;
   margin-top: 4px;
+}
+
+.section-icon svg {
+  width: 1em;
+  height: 1em;
 }
 
 .section-header h1,
@@ -644,6 +654,11 @@ textarea {
   flex-shrink: 0;
 }
 
+.doc-icon svg {
+  width: 1em;
+  height: 1em;
+}
+
 .doc-info {
   display: grid;
   gap: 8px;
@@ -684,6 +699,9 @@ textarea {
   margin: 0;
   font-size: 1.05rem;
   color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Topics Section */
@@ -699,6 +717,9 @@ textarea {
   margin: 0;
   font-size: 1.05rem;
   color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Quiz Styles */
@@ -775,6 +796,33 @@ textarea {
   font-weight: 600;
   color: #0066cc;
   min-width: 24px;
+}
+
+.button-icon,
+.status-icon {
+  flex-shrink: 0;
+}
+
+.button-icon {
+  margin-right: 8px;
+}
+
+.status-icon {
+  margin-right: 8px;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .quiz-answer {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { listDocuments, uploadDocument } from '../services/api';
+import { FileText, Files, LoaderCircle, Upload } from 'lucide-react';
 
 export default function UploadPage() {
   const [documents, setDocuments] = useState([]);
@@ -44,7 +45,7 @@ export default function UploadPage() {
       {/* Upload Section */}
       <section className="page-section">
         <div className="section-header">
-          <div className="section-icon">📄</div>
+          <div className="section-icon"><FileText size={44} strokeWidth={1.75} /></div>
           <div>
             <h1>Upload Documents</h1>
             <p className="section-description">Add PDF files to your research library for analysis</p>
@@ -58,18 +59,18 @@ export default function UploadPage() {
               <span className="file-input-label">{file ? file.name : 'Choose PDF file'}</span>
             </label>
             <button className="button button-primary" type="submit" disabled={loading}>
-              {loading ? '⏳ Uploading...' : '📤 Upload'}
+              {loading ? <><LoaderCircle className="button-icon spin" size={18} strokeWidth={2} /> Uploading...</> : <><Upload className="button-icon" size={18} strokeWidth={2} /> Upload</>}
             </button>
           </form>
-          {status ? <p className="success">✓ {status}</p> : null}
-          {error ? <p className="error">✕ {error}</p> : null}
+          {status ? <p className="success">{status}</p> : null}
+          {error ? <p className="error">{error}</p> : null}
         </div>
       </section>
 
       {/* Documents List Section */}
       <section className="page-section">
         <div className="section-header">
-          <div className="section-icon">📚</div>
+          <div className="section-icon"><Files size={44} strokeWidth={1.75} /></div>
           <h2>Your Documents</h2>
         </div>
         
@@ -82,7 +83,7 @@ export default function UploadPage() {
             <div className="document-list">
               {documents.map((document) => (
                 <article key={document.document_id} className="document-item-modern">
-                  <div className="doc-icon">📄</div>
+                  <div className="doc-icon"><FileText size={24} strokeWidth={1.9} /></div>
                   <div className="doc-info">
                     <strong>{document.filename}</strong>
                     <div className="doc-meta">

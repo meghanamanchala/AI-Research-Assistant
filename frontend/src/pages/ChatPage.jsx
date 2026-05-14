@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { askQuestion, listDocuments } from '../services/api';
+import { AlertCircle, Bookmark, Lightbulb, LoaderCircle, MessageSquareText, Search } from 'lucide-react';
 
 export default function ChatPage() {
   const [documents, setDocuments] = useState([]);
@@ -40,7 +41,7 @@ export default function ChatPage() {
       {/* Chat Section */}
       <section className="page-section">
         <div className="section-header">
-          <div className="section-icon">💬</div>
+          <div className="section-icon"><MessageSquareText size={44} strokeWidth={1.75} /></div>
           <div>
             <h1>Chat with Documents</h1>
             <p className="section-description">Ask questions and get instant answers from your research materials</p>
@@ -67,10 +68,10 @@ export default function ChatPage() {
             </div>
             
             <button className="button button-primary" type="submit" disabled={loading}>
-              {loading ? '⏳ Thinking...' : '🔍 Ask'}
+              {loading ? <><LoaderCircle className="button-icon spin" size={18} strokeWidth={2} /> Thinking...</> : <><Search className="button-icon" size={18} strokeWidth={2} /> Ask</>}
             </button>
           </form>
-          {error ? <p className="error">✕ {error}</p> : null}
+          {error ? <p className="error"><AlertCircle className="status-icon" size={16} strokeWidth={2} />{error}</p> : null}
         </div>
       </section>
 
@@ -78,7 +79,7 @@ export default function ChatPage() {
       {answer ? (
         <section className="page-section">
           <div className="section-header">
-            <div className="section-icon">💡</div>
+            <div className="section-icon"><Lightbulb size={44} strokeWidth={1.75} /></div>
             <h2>Answer</h2>
           </div>
           
@@ -87,7 +88,7 @@ export default function ChatPage() {
             
             {sources.length > 0 && (
               <div className="sources-section">
-                <h3>📌 Sources</h3>
+                <h3><Bookmark size={18} strokeWidth={2} /> Sources</h3>
                 <div className="source-grid">
                   {sources.map((source, index) => (
                     <article className="source-card" key={`${source.document_id || 'source'}-${index}`}>

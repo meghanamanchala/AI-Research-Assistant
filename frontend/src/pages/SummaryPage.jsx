@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { listDocuments, summarizeDocument, extractTopics } from '../services/api';
+import { AlertCircle, ClipboardList, FileText, LoaderCircle, Sparkles, Tags } from 'lucide-react';
 
 export default function SummaryPage() {
   const [documents, setDocuments] = useState([]);
@@ -41,7 +42,7 @@ export default function SummaryPage() {
       {/* Summary Generator Section */}
       <section className="page-section">
         <div className="section-header">
-          <div className="section-icon">📋</div>
+          <div className="section-icon"><ClipboardList size={44} strokeWidth={1.75} /></div>
           <div>
             <h1>Generate Summary</h1>
             <p className="section-description">Create concise summaries of your documents in bullet or paragraph format</p>
@@ -77,10 +78,10 @@ export default function SummaryPage() {
             </div>
             
             <button className="button button-primary" type="button" onClick={handleGenerate} disabled={loading}>
-              {loading ? '⏳ Generating...' : '✨ Generate Summary'}
+              {loading ? <><LoaderCircle className="button-icon spin" size={18} strokeWidth={2} /> Generating...</> : <><Sparkles className="button-icon" size={18} strokeWidth={2} /> Generate Summary</>}
             </button>
           </div>
-          {error ? <p className="error">✕ {error}</p> : null}
+          {error ? <p className="error"><AlertCircle className="status-icon" size={16} strokeWidth={2} />{error}</p> : null}
         </div>
       </section>
 
@@ -88,7 +89,7 @@ export default function SummaryPage() {
       {summary ? (
         <section className="page-section">
           <div className="section-header">
-            <div className="section-icon">📄</div>
+            <div className="section-icon"><FileText size={44} strokeWidth={1.75} /></div>
             <h2>Summary</h2>
           </div>
           
@@ -97,7 +98,7 @@ export default function SummaryPage() {
             
             {topics.length > 0 && (
               <div className="topics-section">
-                <h3>🏷️ Key Topics</h3>
+                <h3><Tags size={18} strokeWidth={2} /> Key Topics</h3>
                 <div className="chip-list">
                   {topics.map((topic) => (
                     <span className="chip" key={topic}>
