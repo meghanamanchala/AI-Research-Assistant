@@ -1,153 +1,138 @@
 # AI Research Assistant
 
-A FastAPI + React starter for PDF-based research workflows: upload a document, ask questions against its contents, generate summaries and quizzes, and compare files.
+A practical starter for building PDF-centered research assistants using a FastAPI backend and a React + Vite frontend. Upload documents, run question answering with citations, generate summaries and quizzes, and compare documents.
 
-## What is included
+**Repository:** d:/AI-Research-Assistant
 
-- FastAPI backend with PDF upload and retrieval endpoints
-- React + Vite frontend with routed pages
-- Upload, chat, summary, quiz, and compare flows
-- Local-first document store with simple chunk retrieval
-- Extension points for LangChain, LangGraph, ChromaDB, and LLM providers
+**Quick summary:** FastAPI API + React UI, local-first document store with optional vectorization via ChromaDB and LLM integrations (OpenAI / Groq).
 
-## Project structure
+**Primary goals:**
+- Ingest PDFs and extract text
+- Provide a conversational QA and summarization interface
+- Generate quizzes and topic extractions for study workflows
+- Offer a minimal RAG-ready code surface for extensions
 
-- `backend/` FastAPI app and services
-- `frontend/` React UI
+**Contents of this README**
+- Project overview and tech stack
+- Quickstart (local dev)
+- Environment variables
+- Project structure and important files
+- API reference (high level)
+- Deployment notes and next steps
 
-## Backend setup
+**Tech Stack**
+- **Backend:** Python, FastAPI, Uvicorn, Pydantic
+- **Frontend:** React 18, Vite, React Router
+- **Styling & UI:** Custom CSS + Lucide React icons
+- **HTTP / Client:** Axios
+- **PDF processing:** pypdf
+- **Vector store (optional):** ChromaDB
+- **Embeddings / Models:** sentence-transformers, OpenAI (or other LLM providers)
+- **RAG helpers:** LangChain, LangGraph (optional integration)
 
-```bash
+Useful dependency sources:
+- See backend dependencies: [backend/requirements.txt](backend/requirements.txt)
+- See frontend deps: [frontend/package.json](frontend/package.json)
+
+---
+
+**Quickstart — Run locally**
+
+Prereqs: Python 3.10+, Node.js 18+, npm
+
+1) Backend (Windows PowerShell)
+
+```powershell
 cd backend
-python -m venv venv
-venv\Scripts\Activate.ps1
+python -m venv .venv
+.venv\\Scripts\\Activate.ps1
 pip install -r requirements.txt
 copy .env.example .env
 uvicorn app.main:app --reload
 ```
 
-## Frontend setup
+Or on macOS / Linux:
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+uvicorn app.main:app --reload
+```
+
+2) Frontend
 
 ```bash
 cd frontend
 npm install
-copy .env.example .env
+cp .env.example .env
 npm run dev
 ```
 
-## API endpoints
+Open the app at http://127.0.0.1:5173 (Vite default).
 
-- `GET /` root
-- `GET /api/health` health check
-- `GET /api/documents` list uploaded documents
-- `POST /api/upload` upload a PDF
-- `POST /api/ask` ask a question
-- `POST /api/summarize` generate a summary
-- `POST /api/quiz` generate quiz items
-- `POST /api/topics` extract topics
-- `POST /api/compare` compare documents
+---
 
-## Deployment
+Environment variables
+- Backend: copy and fill [backend/.env.example](backend/.env.example) or create `.env` in `backend/`:
 
-### Quick Deploy (Recommended)
-
-**Backend** → Render | **Frontend** → Vercel
-
-1. Push to GitHub
-2. Deploy backend to Render (auto-redeploy on push)
-3. Deploy frontend to Vercel (auto-redeploy on push)
-4. Update CORS origins between services
-
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for step-by-step instructions.
-
-### Environment Variables
-
-**Backend (.env)**
 ```env
-OPENAI_API_KEY=your_key_here
-GROQ_API_KEY=your_key_here
+OPENAI_API_KEY=your_openai_key
+# Optional: GROQ_API_KEY, CHROMA settings, etc.
 ```
 
-**Frontend (.env.production)**
+- Frontend: set `VITE_API_BASE_URL` in `frontend/.env` (used by the SPA to connect to the backend):
+
 ```env
-VITE_API_BASE_URL=https://your-backend-url.onrender.com
+VITE_API_BASE_URL=http://127.0.0.1:8000
 ```
 
-## Live Demo
+---
 
-- Frontend: https://ai-research-assistant.vercel.app (update with your URL)
-- Backend API: https://ai-research-assistant-backend.onrender.com (update with your URL)
+Project structure (key files)
+- **backend/** — FastAPI app and services
+  - [backend/app/main.py](backend/app/main.py) — FastAPI entrypoint
+  - [backend/app/api/routes.py](backend/app/api/routes.py) — API routes
+  - [backend/app/services/documents.py](backend/app/services/documents.py) — upload + retrieval helpers
+  - [backend/requirements.txt](backend/requirements.txt) — Python dependencies
 
-## Features
+- **frontend/** — React + Vite SPA
+  - [frontend/src/main.jsx](frontend/src/main.jsx) — app entry
+  - [frontend/src/App.jsx](frontend/src/App.jsx) — routes and layout
+  - [frontend/src/pages/UploadPage.jsx](frontend/src/pages/UploadPage.jsx) — upload UX
+  - [frontend/package.json](frontend/package.json) — npm scripts & deps
 
-- ✅ PDF upload and parsing
-- ✅ Question answering with source citations
-- ✅ Automatic summarization
-- ✅ Quiz generation
-- ✅ Document comparison
-- ✅ Topic extraction
-- ✅ Professional UI with Lucide icons
-- ✅ Responsive design (mobile + desktop)
-- ✅ Light theme, minimal aesthetic
+---
 
-## Tech Stack
+High-level API (examples)
+- `GET /` — root info
+- `GET /api/health` — health check
+- `GET /api/documents` — list uploaded documents
+- `POST /api/upload` — upload a PDF (multipart/form-data)
+- `POST /api/ask` — question answering payload
+- `POST /api/summarize` — request a summary
+- `POST /api/quiz` — request quiz generation
 
-| Component | Technology |
-|-----------|-----------|
-| **Backend** | FastAPI, Uvicorn, Pydantic |
-| **Frontend** | React 18, Vite, React Router |
-| **Styling** | Custom CSS, Lucide React Icons |
-| **HTTP** | Axios |
-| **PDF Processing** | PyPDF |
-| **Vector Store** | ChromaDB (installed, optional) |
-| **LLM** | OpenAI / Groq (optional) |
-| **Deployment** | Render + Vercel |
+(See [backend/app/api/routes.py](backend/app/api/routes.py) for exact schemas and usage.)
 
-## Architecture
+---
 
-```
-User Browser (Vercel)
-    ↓
-React Frontend
-    ↓ (CORS-enabled)
-FastAPI Backend (Render)
-    ↓
-Document Store (in-memory)
-    ↓
-Chunk Retriever
-    ↓
-LLM Response (optional)
-```
+Deployment notes
+- Quick suggestion: host the backend on Render / Railway and the frontend on Vercel. Ensure CORS origins in `backend/app/core/config.py` allow your deployed frontend domain.
+- Update `VITE_API_BASE_URL` in the frontend production env to point to your backend.
 
-## Development
+---
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed setup.
+Contributing
+- Open issues for bugs or feature requests
+- PRs should include tests where applicable and be scoped to a single feature
 
-### Run Locally
+---
 
-**Terminal 1 - Backend:**
-```bash
-cd backend
-venv\Scripts\Activate.ps1  # Windows
-source venv/bin/activate   # Mac/Linux
-uvicorn app.main:app --reload
-```
+License & contact
+- Add a `LICENSE` file to the repo if you intend to open-source this project.
+- Questions: open an issue or reach out in the repository discussion.
 
-**Terminal 2 - Frontend:**
-```bash
-cd frontend
-npm run dev
-```
-
-Then open http://127.0.0.1:5173
-
-## Documentation
-
-- [DEPLOYMENT.md](./DEPLOYMENT.md) - Full deployment guide
-- [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) - Step-by-step checklist
-- Backend API docs: http://localhost:8000/docs
-
-## Notes
-
-- The current backend uses a lightweight retrieval fallback so the MVP works without extra infrastructure.
-- The dependency list includes the packages needed to evolve this into a LangChain / LangGraph RAG stack.
+---
