@@ -7,6 +7,9 @@ from pathlib import Path
 import re
 import uuid
 
+import chromadb
+from app.core.config import CHROMA_DIR
+from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 from pypdf import PdfReader
 
 STOPWORDS = {
@@ -67,37 +70,145 @@ class StoredDocument:
 
 class DocumentStore:
     def __init__(self) -> None:
-        self._documents: dict[str, StoredDocument] = {}
+        self._client = chromadb.PersistentClient(path=str(CHROMA_DIR))
+        self._embedding_function = SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
+        self._documents_collection = self._client.get_or_create_collection(
+            name="uploaded_documents",
+            embedding_function=self._embedding_function,
+        )
+        self._chunks_collection = self._client.get_or_create_collection(
+            name="document_chunks",
+            embedding_function=self._embedding_function,
+        )
+
+    def _document_from_payload(self, payload: dict) -> StoredDocument:
+        metadata = payload["metadata"]
+        return StoredDocument(
+            document_id=metadata["document_id"],
+            filename=metadata["filename"],
+            path=metadata["path"],
+            text=payload["text"],
+            chunks=payload["chunks"],
+            page_count=int(metadata["page_count"]),
+            created_at=metadata["created_at"],
+        )
+
+    def _get_document_payload(self, document_id: str) -> dict:
+        document_result = self._documents_collection.get(
+            ids=[document_id],
+            include=["documents", "metadatas"],
+        )
+        if not document_result.get("ids"):
+            raise KeyError(f"Unknown document_id: {document_id}")
+
+        chunk_result = self._chunks_collection.get(
+            where={"document_id": document_id},
+            include=["documents", "metadatas"],
+        )
+        paired_chunks = list(
+            zip(
+                chunk_result.get("documents", []),
+                chunk_result.get("metadatas", []),
+                strict=False,
+            )
+        )
+        paired_chunks.sort(key=lambda item: int(item[1].get("chunk_index", 0)))
+        chunks = [chunk for chunk, _ in paired_chunks if chunk]
+        text = document_result.get("documents", [""])[0] or "\n\n".join(chunks)
+        return {
+            "metadata": document_result["metadatas"][0],
+            "text": text,
+            "chunks": chunks,
+        }
 
     def add(self, filename: str, file_path: Path, text: str, page_count: int) -> StoredDocument:
         document_id = str(uuid.uuid4())
+        chunks = chunk_text(text)
+        created_at = datetime.now(timezone.utc).isoformat()
+        metadata = {
+            "document_id": document_id,
+            "filename": filename,
+            "path": str(file_path),
+            "page_count": page_count,
+            "chunk_count": len(chunks),
+            "created_at": created_at,
+        }
+
+        self._documents_collection.add(
+            ids=[document_id],
+            documents=[text],
+            metadatas=[metadata],
+        )
+
+        if chunks:
+            self._chunks_collection.add(
+                ids=[f"{document_id}:{index}" for index in range(len(chunks))],
+                documents=chunks,
+                metadatas=[
+                    {
+                        "document_id": document_id,
+                        "filename": filename,
+                        "path": str(file_path),
+                        "page_count": page_count,
+                        "created_at": created_at,
+                        "chunk_index": index,
+                    }
+                    for index in range(len(chunks))
+                ],
+            )
+
         document = StoredDocument(
             document_id=document_id,
             filename=filename,
             path=str(file_path),
             text=text,
-            chunks=chunk_text(text),
+            chunks=chunks,
             page_count=page_count,
-            created_at=datetime.now(timezone.utc).isoformat(),
+            created_at=created_at,
         )
-        self._documents[document_id] = document
         return document
 
     def list(self) -> list[dict]:
-        return [document.to_summary() for document in self._documents.values()]
+        document_result = self._documents_collection.get(include=["metadatas"])
+        summaries: list[dict] = []
+        for metadata in document_result.get("metadatas", []):
+            if not metadata:
+                continue
+            summaries.append(
+                {
+                    "document_id": metadata["document_id"],
+                    "filename": metadata["filename"],
+                    "page_count": int(metadata["page_count"]),
+                    "chunk_count": int(metadata.get("chunk_count", 0)),
+                    "created_at": metadata["created_at"],
+                }
+            )
+        summaries.sort(key=lambda item: item["created_at"], reverse=True)
+        return summaries
 
     def get(self, document_id: str) -> StoredDocument:
-        if document_id not in self._documents:
-            raise KeyError(f"Unknown document_id: {document_id}")
-        return self._documents[document_id]
+        return self._document_from_payload(self._get_document_payload(document_id))
 
     def get_many(self, document_ids: list[str]) -> list[StoredDocument]:
         return [self.get(document_id) for document_id in document_ids]
 
     def latest(self) -> StoredDocument:
-        if not self._documents:
+        documents = self.list()
+        if not documents:
             raise KeyError("No documents have been uploaded yet.")
-        return list(self._documents.values())[-1]
+        return self.get(documents[0]["document_id"])
+
+    def search_chunks(self, document_id: str, query: str, limit: int = 4) -> list[str]:
+        chunk_result = self._chunks_collection.query(
+            query_texts=[query],
+            n_results=limit,
+            where={"document_id": document_id},
+            include=["documents"],
+        )
+        documents = chunk_result.get("documents", [])
+        if not documents:
+            return []
+        return [chunk for chunk in documents[0] if chunk]
 
 
 def extract_text_from_pdf(file_path: Path) -> tuple[str, int]:

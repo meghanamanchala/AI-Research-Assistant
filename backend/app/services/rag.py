@@ -10,8 +10,8 @@ def _join_context(chunks: list[str]) -> str:
     return "\n\n".join(f"- {chunk}" for chunk in chunks)
 
 
-def build_answer(question: str, document: StoredDocument) -> dict:
-    context_chunks = rank_chunks(question, document.chunks, limit=4)
+def build_answer(question: str, document: StoredDocument, context_chunks: list[str] | None = None) -> dict:
+    context_chunks = context_chunks or rank_chunks(question, document.chunks, limit=4)
     answer = _fallback_answer(question, context_chunks)
     return {
         "answer": answer,

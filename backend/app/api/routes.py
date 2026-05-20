@@ -66,7 +66,8 @@ async def upload_pdf(file: UploadFile = File(...)) -> UploadResponse:
 @router.post("/ask", response_model=AskResponse)
 def ask_question(request: AskRequest) -> AskResponse:
     document = _resolve_document(request.document_id)
-    payload = build_answer(request.question, document)
+    context_chunks = store.search_chunks(document.document_id, request.question, limit=4)
+    payload = build_answer(request.question, document, context_chunks=context_chunks)
     return AskResponse(document_id=document.document_id, **payload)
 
 
