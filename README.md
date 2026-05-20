@@ -26,7 +26,7 @@ A practical starter for building PDF-centered research assistants using a FastAP
 - **Styling & UI:** Custom CSS + Lucide React icons
 - **HTTP / Client:** Axios
 - **PDF processing:** pypdf
-- **Vector store (optional):** ChromaDB
+- **Vector store:** ChromaDB with persistent local storage in `backend/chroma_db/`
 - **Embeddings / Models:** sentence-transformers, OpenAI (or other LLM providers)
 - **RAG helpers:** LangChain, LangGraph (optional integration)
 
@@ -72,6 +72,8 @@ npm run dev
 ```
 
 Open the app at http://127.0.0.1:5173 (Vite default).
+
+Document storage now persists through ChromaDB, so uploaded PDFs remain available after backend restarts and `/api/ask` uses semantic chunk retrieval from the local vector store.
 
 ---
 
