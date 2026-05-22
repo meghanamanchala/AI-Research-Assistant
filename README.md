@@ -37,6 +37,12 @@ A practical starter for building PDF-centered research assistants using a FastAP
 - **Retrieval filtering:** Chunk search is constrained to the selected document and only a small top-k set of the most relevant chunks is passed forward, which keeps the context focused and reduces drift.
 - **Hallucination mitigation:** The answer payload includes source previews and the backend falls back to a clear "No relevant content was found" response when the document does not support a grounded answer.
 
+**Chunking strategy and splitting details**
+- **Default parameters:** The backend implements a sliding-window text splitter (see `backend/app/services/documents.py`) with a default chunk size of 1000 characters and an overlap of 200 characters. Text is normalized by collapsing whitespace before chunking.
+- **Behavior:** The splitter takes the document text, produces contiguous chunks with the configured overlap to reduce information loss at chunk boundaries, and stores each chunk as a separate vector in ChromaDB. The API surfaces these chunks for retrieval and ranking during `/api/ask`.
+- **Semantic splitting (optional):** The current implementation uses a fixed-size sliding window for simplicity and deterministic behavior. For better semantic coherence you can replace the splitter with a sentence- or semantic-aware text splitter (for example, LangChain's `RecursiveCharacterTextSplitter` with `separators` tuned to sentence boundaries, or a transformer-based sentence segmenter) to avoid cutting mid-sentence and to group semantically-related text.
+- **Tradeoffs & recommendations:** Larger chunks keep more context but may introduce irrelevant material; smaller chunks are more focused but increase the number of vectors and retrieval cost. Overlap (e.g., 200 chars) helps preserve context across chunk borders. If your documents include dense, highly-interconnected content (research papers, legal text), prefer semantic/sentence-aware splitting; for general PDFs the default sliding window with modest overlap is a practical, low-dependency choice.
+
 Useful dependency sources:
 - See backend dependencies: [backend/requirements.txt](backend/requirements.txt)
 - See frontend deps: [frontend/package.json](frontend/package.json)
