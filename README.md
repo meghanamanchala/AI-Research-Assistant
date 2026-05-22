@@ -6,6 +6,8 @@ A practical starter for building PDF-centered research assistants using a FastAP
 
 **Quick summary:** FastAPI API + React UI, local-first document store with optional vectorization via ChromaDB and LLM integrations (OpenAI / Groq).
 
+**Grounding and hallucination handling:** The system keeps answers anchored to the uploaded PDF content by retrieving only document-specific chunks, ranking them before generation, and returning source previews alongside the answer. When the retrieval step does not find relevant content, the API returns an explicit no-answer fallback instead of inventing details.
+
 **Primary goals:**
 - Ingest PDFs and extract text
 - Provide a conversational QA and summarization interface
@@ -29,6 +31,11 @@ A practical starter for building PDF-centered research assistants using a FastAP
 - **Vector store:** ChromaDB with persistent local storage in `backend/chroma_db/`
 - **Embeddings / Models:** sentence-transformers, OpenAI (or other LLM providers)
 - **RAG helpers:** LangChain, LangGraph (optional integration)
+
+**How hallucinations are reduced**
+- **Grounding strategy:** `/api/ask` resolves the target document, retrieves matching chunks from ChromaDB, and builds the answer from that context rather than from the model alone.
+- **Retrieval filtering:** Chunk search is constrained to the selected document and only a small top-k set of the most relevant chunks is passed forward, which keeps the context focused and reduces drift.
+- **Hallucination mitigation:** The answer payload includes source previews and the backend falls back to a clear "No relevant content was found" response when the document does not support a grounded answer.
 
 Useful dependency sources:
 - See backend dependencies: [backend/requirements.txt](backend/requirements.txt)
