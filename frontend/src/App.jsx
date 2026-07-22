@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import UploadPage from './pages/UploadPage';
+import AgentPage from './pages/AgentPage';
 import ChatPage from './pages/ChatPage';
 import SummaryPage from './pages/SummaryPage';
 import QuizPage from './pages/QuizPage';
@@ -14,6 +15,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/upload" element={<UploadPage />} />
+        <Route path="/agent" element={<AgentPage />} />
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/summary" element={<SummaryPage />} />
         <Route path="/quiz" element={<QuizPage />} />

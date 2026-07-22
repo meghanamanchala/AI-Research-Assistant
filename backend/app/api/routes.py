@@ -6,6 +6,8 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from app.core.config import UPLOAD_DIR
 from app.models.schemas import (
+    AgentResearchRequest,
+    AgentResearchResponse,
     AskRequest,
     AskResponse,
     CompareRequest,
@@ -18,6 +20,7 @@ from app.models.schemas import (
     TopicsResponse,
     UploadResponse,
 )
+from app.services.agent import ResearchAgent
 from app.services.documents import (
     DocumentStore,
     build_comparison,
@@ -28,11 +31,16 @@ from app.services.rag import build_answer, build_quiz, build_summary
 
 router = APIRouter(prefix="/api", tags=["documents"])
 store = DocumentStore()
+agent = ResearchAgent(store)
 
 
 @router.get("/health")
 def health() -> dict:
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "embedding_provider": store.embedding_provider,
+        "agent_status": "ready",
+    }
 
 
 @router.get("/documents", response_model=list[DocumentSummary])
@@ -54,6 +62,9 @@ async def upload_pdf(file: UploadFile = File(...)) -> UploadResponse:
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=400, detail=f"Could not read PDF: {exc}") from exc
 
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Extracted text from PDF is empty. The PDF may be scanned or empty.")
+
     document = store.add(file.filename, destination, text, page_count)
     return UploadResponse(
         document_id=document.document_id,
@@ -68,7 +79,20 @@ def ask_question(request: AskRequest) -> AskResponse:
     document = _resolve_document(request.document_id)
     context_chunks = store.search_chunks(document.document_id, request.question, limit=4)
     payload = build_answer(request.question, document, context_chunks=context_chunks)
-    return AskResponse(document_id=document.document_id, **payload)
+    return AskResponse(
+        document_id=document.document_id,
+        embedding_provider=store.embedding_provider,
+        **payload,
+    )
+
+
+@router.post("/agent/research", response_model=AgentResearchResponse)
+def run_research_agent(request: AgentResearchRequest) -> AgentResearchResponse:
+    return agent.run_research(
+        goal=request.goal,
+        document_id=request.document_id,
+        max_steps=request.max_steps,
+    )
 
 
 @router.post("/summarize", response_model=SummaryResponse)

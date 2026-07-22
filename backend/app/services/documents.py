@@ -7,10 +7,25 @@ from pathlib import Path
 import re
 import uuid
 
+
+# pyrefly: ignore [missing-import]
 import chromadb
-from app.core.config import CHROMA_DIR
-from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+from app.core.config import CHROMA_DIR, EMBEDDING_PROVIDER, OPENAI_API_KEY
+
+# pyrefly: ignore [missing-import]
+from chromadb.utils.embedding_functions import (
+    OpenAIEmbeddingFunction,
+    SentenceTransformerEmbeddingFunction,
+)
+# pyrefly: ignore [missing-import]
 from pypdf import PdfReader
+
+
+def get_embedding_function():
+    if EMBEDDING_PROVIDER == "openai" and OPENAI_API_KEY:
+        return OpenAIEmbeddingFunction(api_key=OPENAI_API_KEY, model_name="text-embedding-3-small")
+    return SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
+
 
 STOPWORDS = {
     "a",
@@ -71,7 +86,8 @@ class StoredDocument:
 class DocumentStore:
     def __init__(self) -> None:
         self._client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-        self._embedding_function = SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
+        self._embedding_function = get_embedding_function()
+        self.embedding_provider = "openai" if isinstance(self._embedding_function, OpenAIEmbeddingFunction) else "sentence-transformers"
         self._documents_collection = self._client.get_or_create_collection(
             name="uploaded_documents",
             embedding_function=self._embedding_function,
@@ -198,17 +214,47 @@ class DocumentStore:
             raise KeyError("No documents have been uploaded yet.")
         return self.get(documents[0]["document_id"])
 
-    def search_chunks(self, document_id: str, query: str, limit: int = 4) -> list[str]:
+    def search_chunks(self, document_id: str | None, query: str, limit: int = 4) -> list[str]:
+        where_clause = {"document_id": document_id} if document_id else None
         chunk_result = self._chunks_collection.query(
             query_texts=[query],
             n_results=limit,
-            where={"document_id": document_id},
+            where=where_clause,
             include=["documents"],
         )
         documents = chunk_result.get("documents", [])
         if not documents:
             return []
         return [chunk for chunk in documents[0] if chunk]
+
+    def search_chunks_with_metadata(
+        self, query: str, document_id: str | None = None, limit: int = 4
+    ) -> list[dict]:
+        where_clause = {"document_id": document_id} if document_id else None
+        chunk_result = self._chunks_collection.query(
+            query_texts=[query],
+            n_results=limit,
+            where=where_clause,
+            include=["documents", "metadatas", "distances"],
+        )
+        documents = chunk_result.get("documents", [[]])[0]
+        metadatas = chunk_result.get("metadatas", [[]])[0]
+        distances = chunk_result.get("distances", [[]])[0]
+
+        results = []
+        for idx in range(len(documents)):
+            doc_text = documents[idx]
+            meta = metadatas[idx] if idx < len(metadatas) else {}
+            dist = distances[idx] if idx < len(distances) else 0.5
+            results.append({
+                "text": doc_text,
+                "document_id": meta.get("document_id", document_id or ""),
+                "filename": meta.get("filename", "document.pdf"),
+                "chunk_index": meta.get("chunk_index", 0),
+                "distance": dist,
+            })
+        return results
+
 
 
 def extract_text_from_pdf(file_path: Path) -> tuple[str, int]:

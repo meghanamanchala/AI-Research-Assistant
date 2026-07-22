@@ -18,3 +18,6 @@ BACKEND_CORS_ORIGINS = [
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
 DEFAULT_LLM_MODEL = os.getenv("DEFAULT_LLM_MODEL", "gpt-4o-mini")
+EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "sentence-transformers").lower().strip()
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai" if OPENAI_API_KEY else "groq" if GROQ_API_KEY else "local_fallback").lower().strip()
+

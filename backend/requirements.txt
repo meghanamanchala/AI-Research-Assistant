@@ -11,3 +11,5 @@ chromadb
 sentence-transformers
 python-dotenv
 langgraph
+pytest
+httpx

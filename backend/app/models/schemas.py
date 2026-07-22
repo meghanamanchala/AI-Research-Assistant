@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, Any
 
 from pydantic import BaseModel, Field
 
@@ -30,11 +30,13 @@ class AskResponse(BaseModel):
     sources: list[dict]
     context: list[str]
     document_id: str | None = None
+    confidence_score: float = 0.85
+    embedding_provider: str = "sentence-transformers"
 
 
 class SummaryRequest(BaseModel):
     document_id: str | None = None
-    style: Literal["bullet", "paragraph"] = "bullet"
+    style: Literal["bullet", "paragraph", "executive"] = "bullet"
 
 
 class SummaryResponse(BaseModel):
@@ -51,6 +53,7 @@ class QuizItem(BaseModel):
     question: str
     options: list[str]
     answer: str
+    source: str | None = None
 
 
 class QuizResponse(BaseModel):
@@ -70,3 +73,27 @@ class CompareRequest(BaseModel):
 class CompareResponse(BaseModel):
     comparison: str
     document_ids: list[str]
+
+
+class ThoughtStep(BaseModel):
+    step: int
+    thought: str
+    action: str | None = None
+    action_input: str | None = None
+    observation: str | None = None
+
+
+class AgentResearchRequest(BaseModel):
+    goal: str = Field(min_length=3, max_length=4000)
+    document_id: str | None = None
+    max_steps: int = Field(default=5, ge=1, le=10)
+
+
+class AgentResearchResponse(BaseModel):
+    goal: str
+    answer: str
+    confidence_score: float
+    thought_steps: list[ThoughtStep]
+    tools_used: list[str]
+    citations: list[dict[str, Any]]
+    document_id: str | None = None

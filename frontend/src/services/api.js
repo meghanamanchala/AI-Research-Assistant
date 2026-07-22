@@ -4,6 +4,11 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
 });
 
+export async function checkHealth() {
+  const response = await api.get('/api/health');
+  return response.data;
+}
+
 export async function listDocuments() {
   const response = await api.get('/api/documents');
   return response.data;
@@ -20,6 +25,11 @@ export async function uploadDocument(file) {
 
 export async function askQuestion(payload) {
   const response = await api.post('/api/ask', payload);
+  return response.data;
+}
+
+export async function runAgentResearch(payload) {
+  const response = await api.post('/api/agent/research', payload);
   return response.data;
 }
 
